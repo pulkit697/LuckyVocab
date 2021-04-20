@@ -23,14 +23,14 @@ try:
         mySocket.recv(1024)
         print('Correct word was:', word)
     print('Your score is:', score)
+    mySocket.send(bytes(str(score), ENCODING_METHOD))
+    oppositeScore = int(mySocket.recv(1024).decode())
+    if oppositeScore > score:
+        print('Opposition won!')
+    elif oppositeScore == score:
+        print('Game draw!!!')
+    else:
+        print('You won!!!')
 except ConnectionResetError:
     print('Game already started!')
-mySocket.send(bytes(str(score), ENCODING_METHOD))
-oppositeScore = int(mySocket.recv(1024).decode())
-if oppositeScore > score:
-    print('Opposition won!')
-elif oppositeScore == score:
-    print('Game draw!!!')
-else:
-    print('You won!!!')
 mySocket.close()
