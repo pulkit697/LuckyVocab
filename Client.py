@@ -1,6 +1,7 @@
 import socket
 import threading
 from Constants import *
+from time import *
 
 my_socket = socket.socket()
 
@@ -46,6 +47,7 @@ def play_game(_my_socket):
         _my_socket.send(bytes(FLAG_RESPONSE_SUBMITTED, ENCODING_METHOD))
         _my_socket.recv(1024)
         print('Correct word was:', word)
+        sleep(3)
     end_game(_my_socket, _score)
 
 
@@ -53,7 +55,7 @@ def end_game(my_socket,score):
     my_socket.send(bytes(str(score),ENCODING_METHOD))
     s = my_socket.recv(1024).decode()
     print(s)
-    input()
+    input('Press enter to exit')
     close_connection(my_socket)
 
 

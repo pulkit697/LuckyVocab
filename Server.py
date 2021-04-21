@@ -1,4 +1,4 @@
-import socket
+# import socket
 from tkinter import *
 from Constants import *
 
@@ -10,7 +10,7 @@ server_socket.bind((SERVER_IP, SERVER_PORT))
 def connect():
     name = input('enter name: ')
     print('You are the host!')
-    server_socket.listen(3)
+    server_socket.listen()
     while True:
         client_socket, client_address = server_socket.accept()
         client_socket.send(bytes(name, ENCODING_METHOD))
@@ -29,11 +29,13 @@ def broadcast_message(message):
     print(message)
     for client in clients:
         client.send(bytes(message, ENCODING_METHOD))
+        print('sent!')
 
 
 def receive_from_all():
-    for client in clients:
-        client.recv(1024)
+    for i in range(len(clients)):
+        clients[i].recv(1024)
+        print('received from',names[i])
 
 
 def play_game():
@@ -57,11 +59,14 @@ def end_game():
         scores.append(int(client.recv(1024).decode()))
     maxim = 0
     index = 0
+    result = ''
     for i in range(len(scores)):
+        result+=names[i]+' : '+str(scores[i])+'\n'
         if scores[i] > maxim:
             maxim = scores[i]
             index = i
-    broadcast_message(names[i] + ' is Winner!')
+    result+='Winner is: \n' + names[index] +'\n 🤩🤩🤩🤩🤩🤩🤩'
+    broadcast_message(result)
     close_connection()
 
 
