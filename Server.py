@@ -2,58 +2,71 @@ import socket
 from tkinter import *
 from Constants import *
 
+clients = []
+names = []
+server_socket = socket.socket()
+server_socket.bind((SERVER_IP, SERVER_PORT))
 
 def connect():
-    server_socket = socket.socket()
-    server_socket.bind((SERVER_IP, SERVER_PORT))
     name = input('enter name: ')
     print('You are the host!')
-    server_socket.listen(1)
+    server_socket.listen(3)
     while True:
         client_socket, client_address = server_socket.accept()
-        break
-    client_socket.send(bytes(name, ENCODING_METHOD))
-    client_name = client_socket.recv(1024).decode()
-    print(client_name, 'joined.')
-    return server_socket, client_socket, client_name
+        client_socket.send(bytes(name, ENCODING_METHOD))
+        client_name = client_socket.recv(1024).decode()
+        print(client_name+' has joined...')
+        broadcast_message(client_name)
+        names.append(client_name)
+        clients.append(client_socket)
+        if len(clients) == 3:
+            broadcast_message('GAME STARTED!')
+            break
+    play_game()
 
 
-def play_game(client_socket):
-    score = 0
+def broadcast_message(message):
+    print(message)
+    for client in clients:
+        client.send(bytes(message, ENCODING_METHOD))
+
+
+def receive_from_all():
+    for client in clients:
+        client.recv(1024)
+
+
+def play_game():
+    receive_from_all()
     for i in range(NUMBER_OF_ROUNDS):
         print('round', i + 1)
         word = choose_random_word()
         blank_query = return_blank_string(word, 2)
-        client_socket.send(bytes(word, ENCODING_METHOD))
-        data_received = client_socket.recv(1024).decode()
-        client_socket.send(bytes(blank_query, ENCODING_METHOD))
-        print('\t\t', blank_query)
-        my_response = input('Enter your response: ')
-        score += calculate_difference(word, my_response)
-        print('waiting for other players...')
-        client_socket.recv(1024)
-        client_socket.send(bytes(FLAG_ALL_SUBMISSIONS_RECEIVED, ENCODING_METHOD))
-        print('Correct word was:', word)
-    return score
+        broadcast_message(word)
+        receive_from_all()
+        broadcast_message(blank_query)
+        print('\t\t', word, '\t\t', blank_query)
+        receive_from_all()
+        broadcast_message('sending new word...')
+    end_game()
 
 
-def end_game(client_socket, client_name, _score):
-    print('Your score is:', _score)
-    client_socket.send(bytes(str(_score), ENCODING_METHOD))
-    opposite_score = int(client_socket.recv(1024).decode())
-    if opposite_score > _score:
-        print(client_name, ' won!')
-    elif opposite_score == _score:
-        print('Game draw!!!')
-    else:
-        print('You won!!!')
+def end_game():
+    scores = []
+    for client in clients:
+        scores.append(int(client.recv(1024).decode()))
+    maxim = 0
+    index = 0
+    for i in range(len(scores)):
+        if scores[i] > maxim:
+            maxim = scores[i]
+            index = i
+    broadcast_message(names[i] + ' is Winner!')
+    close_connection()
 
 
-def close_connection(server_socket):
+def close_connection():
     server_socket.close()
 
+connect()
 
-serverSocket, clientSocket, clientName = connect()
-score = play_game(clientSocket)
-end_game(clientSocket, clientName, score)
-close_connection(serverSocket)

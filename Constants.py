@@ -42,7 +42,9 @@ CORRECT_ANSWER_FG_COLOR = 'GREEN'
 CORRECT_ANSWER_BG_COLOR = 'WHITE'
 TEXT_INPUT_RESPONSE_FG_COLOR = 'BLACK'
 TEXT_INPUT_RESPONSE_BG_COLOR = 'WHITE'
-TEXT_INPUT_RESPONSE_CURSOR_COLOR = 'BLACK'
+TEXT_INPUT_RESPONSE_CURSOR_COLOR = 'grey'
+TEXT_INPUT_RESPONSE_FONT = 'Fira code'
+TEXT_INPUT_RESPONSE_FONT_SIZE = 10
 TIMER_BG_COLOR = 'white'
 TIMER_FG_COLOR = 'black'
 CORRECT_ANSWER_TEXT_SIZE = 12
@@ -52,9 +54,9 @@ QUERY_STRING_FONT = 'fira code'
 
 
 def calculate_difference(word1, word2):
-    score = 10
+    score = 0
     if len(word1) == len(word2):
-        for i in range(len(word1) - 1):
+        for i in range(len(word1)):
             if word1[i] == word2[i]:
                 score += 5
     return score
