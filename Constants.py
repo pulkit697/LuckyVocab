@@ -1,7 +1,7 @@
 import random
 import socket
 
-SERVER_IP = socket.gethostbyname(socket.gethostname())
+# SERVER_IP = "192.168.0.8"
 ENCODING_METHOD = 'utf-8'
 SERVER_PORT = 9999
 DATA_RECEIVED = 'DATA_RECEIVED'

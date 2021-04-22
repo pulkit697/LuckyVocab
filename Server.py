@@ -4,14 +4,17 @@ from Constants import *
 
 clients = []
 names = []
-server_socket = socket.socket()
-server_socket.bind((SERVER_IP, SERVER_PORT))
+server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+server_socket.bind(('', SERVER_PORT))
+SERVER_NAME = socket.gethostname()
+print('host name to enter: ', SERVER_NAME)
+NUMBER_OF_CONNECTIONS = int(input('Enter number of participants: '))
 
 def connect():
     name = input('enter name: ')
     print('You are the host!')
     server_socket.listen()
-    while True:
+    while len(clients) != NUMBER_OF_CONNECTIONS:
         client_socket, client_address = server_socket.accept()
         client_socket.send(bytes(name, ENCODING_METHOD))
         client_name = client_socket.recv(1024).decode()
@@ -19,14 +22,12 @@ def connect():
         broadcast_message(client_name)
         names.append(client_name)
         clients.append(client_socket)
-        if len(clients) == 3:
-            broadcast_message('GAME STARTED!')
-            break
+    broadcast_message('GAME STARTED!')
     play_game()
 
 
 def broadcast_message(message):
-    print(message)
+    # print(message)
     for client in clients:
         client.send(bytes(message, ENCODING_METHOD))
         print('sent!')
@@ -47,8 +48,9 @@ def play_game():
         broadcast_message(word)
         receive_from_all()
         broadcast_message(blank_query)
-        print('\t\t', word, '\t\t', blank_query)
+        print('\t\t', blank_query)
         receive_from_all()
+        print('Correct word was: ',word)
         broadcast_message('sending new word...')
     end_game()
 

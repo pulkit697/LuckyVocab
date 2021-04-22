@@ -4,12 +4,14 @@ from Constants import *
 from time import *
 
 my_socket = socket.socket()
+SERVER_NAME = input('Enter server name: ')
+SERVER_IP = socket.gethostbyname(SERVER_NAME)
 
 def connect():
     name = input('enter your name: ')
     my_socket.connect((SERVER_IP, SERVER_PORT))
+    print(SERVER_IP)
     _server_name = my_socket.recv(1024).decode()
-    print(_server_name, 'is the host!')
     print('You joined!')
     my_socket.send(bytes(name, ENCODING_METHOD))
     thread = threading.Thread(target=receive_messages)
